@@ -12,8 +12,14 @@
 #include "lexicon.h"
 #include "filelib.h"
 #include "strlib.h"
+#include "stack.h"
+#include "queue.h"
 
 using namespace std;
+
+Stack<string> findLadder(string word_1, string word_2, const Lexicon &english);
+Lexicon findNeighbors(string word, const Lexicon &english);
+
 
 int main() {
   cout << "Welcome to CS 106B Word Ladder." << endl;
@@ -65,9 +71,93 @@ int main() {
       continue;
     }
 
+    Stack<string> ladder = findLadder(word_1, word_2, english);
+
+    if (ladder.isEmpty()) {
+      cout << "No ladder found between these two words. " << endl;
+    } else {
+      while (!ladder.isEmpty()) {
+    	cout << ladder.pop() << " ";
+      }
+    }
+
+    cout << endl;
+
   }
 
 
   cout << "Have a nice day." << endl;
   return 0;
+}
+
+
+/* Function: findLadder
+ * Usage:    ladder = findLadder(string1, string2)
+ * ------------------------------------------------
+ * Finds the minimum length ladder between two English words
+ * Use BFS algorithm specified by assignment handout
+ * Precondition:
+ * Postcondition:
+ */
+Stack<string> findLadder(string w1, string w2, const Lexicon &english) {
+  //this is the main data structure
+  Queue<Stack<string> > searchPath;
+  Lexicon seenWords;
+  Stack<string> current;
+
+
+  Stack<string> initial;
+  initial.push(w1);
+  searchPath.enqueue(initial);
+  seenWords.add(w1);
+
+  while (!searchPath.isEmpty()) {
+    current = searchPath.dequeue();
+    Lexicon neighbors; // all enlish words that are one letter from givenword
+    neighbors = findNeighbors(current.peek(), english); // where the bug was
+    //cout << "the size of neighbors is " << neighbors.size() << endl;
+    for (string word : neighbors) {
+      //cout << word << " " ;
+      if (!seenWords.contains(word)) {
+	seenWords.add(word);
+	if (word == w2) {
+	  current.push(word);
+	  return current;
+	} else {
+	  Stack<string> copy;
+	  copy = current;
+	  copy.push(word);
+	  searchPath.enqueue(copy);
+	}
+      }
+    }
+  }
+
+  Stack<string> empty;		// indicates no ladder found
+  return empty;
+}
+
+
+/* Function: findNeightbors
+ * Usage:    lex = findNeighbors(word)
+ * -----------------------------------
+ * Finds all the english words that are
+ * One letter different from the given word
+ * Precondition:
+ * Postcondition:
+ */
+Lexicon findNeighbors(string word, const Lexicon &english) {
+  Lexicon result;
+
+  for (int i = 0; i < word.length(); i++) {
+    for (int j = 0; j < 26; j++) {
+      char current = 'a' + j;
+      string temp = word.substr(0, i) + current + word.substr(i+1);
+      if (english.contains(temp)) {
+	result.add(temp);
+      }
+    }
+  }
+
+  return result;
 }
