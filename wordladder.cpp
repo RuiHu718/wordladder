@@ -20,7 +20,6 @@ using namespace std;
 Stack<string> findLadder(string word_1, string word_2, const Lexicon &english);
 Lexicon findNeighbors(string word, const Lexicon &english);
 
-
 int main() {
   cout << "Welcome to CS 106B Word Ladder." << endl;
   cout << "Please give two English words, and I will change the" << endl;
@@ -28,6 +27,7 @@ int main() {
   cout << endl;
   cout << endl;
   
+  // load dictionary file
   string filename;
   Lexicon english;
   while (true) {
@@ -73,6 +73,7 @@ int main() {
 
     Stack<string> ladder = findLadder(word_1, word_2, english);
 
+    // print out final results
     if (ladder.isEmpty()) {
       cout << "No ladder found between these two words. " << endl;
     } else {
@@ -80,11 +81,8 @@ int main() {
     	cout << ladder.pop() << " ";
       }
     }
-
     cout << endl;
-
   }
-
 
   cout << "Have a nice day." << endl;
   return 0;
@@ -115,7 +113,7 @@ Stack<string> findLadder(string w1, string w2, const Lexicon &english) {
     current = searchPath.dequeue();
     Lexicon neighbors; // all enlish words that are one letter from givenword
     neighbors = findNeighbors(current.peek(), english); // where the bug was
-    //cout << "the size of neighbors is " << neighbors.size() << endl;
+
     for (string word : neighbors) {
       //cout << word << " " ;
       if (!seenWords.contains(word)) {
@@ -124,8 +122,7 @@ Stack<string> findLadder(string w1, string w2, const Lexicon &english) {
 	  current.push(word);
 	  return current;
 	} else {
-	  Stack<string> copy;
-	  copy = current;
+	  Stack<string> copy = current;
 	  copy.push(word);
 	  searchPath.enqueue(copy);
 	}
@@ -158,6 +155,5 @@ Lexicon findNeighbors(string word, const Lexicon &english) {
       }
     }
   }
-
   return result;
 }
